@@ -1,0 +1,229 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum OrderStatus {
+  NEW
+  CONFIRMED
+  IN_WAREHOUSE
+  PROCESSING
+  IN_TRANSIT
+  CUSTOMS_CLEARANCE
+  OUT_FOR_DELIVERY
+  DELIVERED
+  PROBLEM
+  CANCELLED
+}
+
+enum PaymentStatus {
+  UNPAID
+  PARTIAL
+  PAID
+  OVERDUE
+}
+
+enum ServiceType {
+  EXPRESS
+  ECONOMY
+  AIR
+  SEA
+}
+
+enum ShippingTransportType {
+  AIR
+  SEA
+  EXPRESS
+  ECONOMY
+  OTHER
+}
+
+enum CostRateType {
+  FIXED_TOTAL
+  PER_KG
+}
+
+model Customer {
+  id           String   @id @default(cuid())
+  customerCode String   @unique
+  name         String
+  phone        String
+  email        String?
+  address      String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  orders Order[]
+}
+
+model Order {
+  id                 String        @id @default(cuid())
+  orderCode          String        @unique
+  trackingCode       String        @unique
+  customerId         String
+  shippingServiceId  String?
+  senderName         String
+  senderPhone        String
+  senderAddress      String
+  receiverName       String
+  receiverPhone      String
+  receiverAddress    String
+  originCountry      String
+  destinationCountry String
+  serviceType        ServiceType
+  goodsType          String
+  packageCount       Int
+  actualWeight       Float
+  volumetricWeight   Float
+  chargeableWeight   Float
+  baseFee            Int
+  surchargeFee       Int
+  discountFee        Int
+  totalFee           Int
+  baseCost           Float         @default(0)
+  extraCostTotal     Float         @default(0)
+  profit             Float         @default(0)
+  paymentStatus      PaymentStatus @default(UNPAID)
+  status             OrderStatus   @default(NEW)
+  internalNote       String?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  customer       Customer        @relation(fields: [customerId], references: [id])
+  shippingService ShippingService? @relation(fields: [shippingServiceId], references: [id])
+  packages       Package[]
+  trackingEvents TrackingEvent[]
+  payments       Payment[]
+  extraCosts     OrderExtraCost[]
+
+  @@index([customerId])
+  @@index([shippingServiceId])
+  @@index([status])
+  @@index([paymentStatus])
+  @@index([createdAt])
+}
+
+model ShippingService {
+  id              String                @id @default(cuid())
+  code            String                @unique
+  name            String
+  transportType   ShippingTransportType
+  destinationZone String
+  description     String?
+  isActive        Boolean               @default(true)
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+
+  orders Order[]
+  costRates ServiceCostRate[]
+
+  @@index([transportType])
+  @@index([isActive])
+  @@index([destinationZone])
+}
+
+model ServiceCostRate {
+  id                String       @id @default(cuid())
+  shippingServiceId String
+  label             String
+  minWeight         Float
+  maxWeight         Float?
+  rateType          CostRateType
+  amount            Float
+  currency          String       @default("VND")
+  isActive          Boolean      @default(true)
+  sortOrder         Int          @default(0)
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  shippingService ShippingService @relation(fields: [shippingServiceId], references: [id], onDelete: Cascade)
+
+  @@index([shippingServiceId])
+  @@index([rateType])
+  @@index([isActive])
+  @@index([sortOrder])
+}
+
+model CostItem {
+  id            String   @id @default(cuid())
+  name          String
+  defaultAmount Float
+  description   String?
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  orderExtraCosts OrderExtraCost[]
+
+  @@index([isActive])
+}
+
+model OrderExtraCost {
+  id         String   @id @default(cuid())
+  orderId    String
+  costItemId String?
+  name       String
+  amount     Float
+  note       String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  order    Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  costItem CostItem? @relation(fields: [costItemId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+  @@index([costItemId])
+}
+
+model Package {
+  id               String   @id @default(cuid())
+  packageCode      String   @unique
+  orderId          String
+  length           Float
+  width            Float
+  height           Float
+  actualWeight     Float
+  volumetricWeight Float
+  chargeableWeight Float
+  description      String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+}
+
+model TrackingEvent {
+  id        String      @id @default(cuid())
+  orderId   String
+  status    OrderStatus
+  message   String
+  location  String?
+  eventTime DateTime
+  createdAt DateTime    @default(now())
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([eventTime])
+}
+
+model Payment {
+  id        String    @id @default(cuid())
+  orderId   String
+  amount    Int
+  method    String?
+  note      String?
+  paidAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([paidAt])
+}
