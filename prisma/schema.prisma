@@ -47,6 +47,34 @@ enum CostRateType {
   PER_KG
 }
 
+enum PickupStatus {
+  PENDING
+  ASSIGNED
+  ACCEPTED
+  ON_THE_WAY
+  ARRIVED
+  PICKED_UP
+  FAILED
+  CANCELLED
+}
+
+enum VehicleType {
+  MOTORBIKE
+  CAR
+  VAN
+  TRUCK
+  OTHER
+}
+
+enum PickupPhotoType {
+  GOODS
+  PACKAGE
+  LABEL
+  RECEIPT
+  CUSTOMER_SIGNATURE
+  OTHER
+}
+
 model Customer {
   id           String   @id @default(cuid())
   customerCode String   @unique
@@ -58,6 +86,7 @@ model Customer {
   updatedAt    DateTime @updatedAt
 
   orders Order[]
+  pickupRequests PickupRequest[]
 }
 
 model Order {
@@ -99,6 +128,7 @@ model Order {
   trackingEvents TrackingEvent[]
   payments       Payment[]
   extraCosts     OrderExtraCost[]
+  pickupRequest  PickupRequest?
 
   @@index([customerId])
   @@index([shippingServiceId])
@@ -226,4 +256,112 @@ model Payment {
 
   @@index([orderId])
   @@index([paidAt])
+}
+
+model Driver {
+  id             String      @id @default(cuid())
+  driverCode     String      @unique
+  name           String
+  phone          String
+  email          String?
+  vehicleType    VehicleType
+  vehiclePlate   String?
+  identityNumber String?
+  isActive       Boolean     @default(true)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  pickupRequests PickupRequest[]
+
+  @@index([isActive])
+  @@index([vehicleType])
+}
+
+model PickupRequest {
+  id                   String           @id @default(cuid())
+  pickupCode           String           @unique
+  orderId              String?           @unique
+  customerId           String?
+  driverId             String?
+
+  // Sender information
+  senderName           String
+  senderPhone          String
+  senderAddress        String
+  senderWard           String?
+  senderDistrict       String?
+  senderCity           String           @default("Ho Chi Minh City")
+  pickupLatitude       Float?
+  pickupLongitude      Float?
+
+  // Pickup information
+  pickupDate           DateTime
+  pickupTimeWindow     String?
+  vehicleType          VehicleType
+  estimatedPackageCount Int
+  estimatedWeight      Float?
+  actualPackageCount   Int?
+  actualWeight         Float?
+  goodsDescription     String?
+  pickupNote           String?
+  internalNote         String?
+
+  // Status
+  status               PickupStatus     @default(PENDING)
+  failedReason         String?
+
+  // Timestamps
+  assignedAt           DateTime?
+  acceptedAt           DateTime?
+  onTheWayAt           DateTime?
+  arrivedAt            DateTime?
+  pickedUpAt           DateTime?
+  failedAt             DateTime?
+  cancelledAt          DateTime?
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+
+  // Relations
+  order               Order?            @relation(fields: [orderId], references: [id])
+  customer            Customer?         @relation(fields: [customerId], references: [id])
+  driver              Driver?           @relation(fields: [driverId], references: [id])
+  photos              PickupPhoto[]
+  statusLogs          PickupStatusLog[]
+
+  @@index([orderId])
+  @@index([customerId])
+  @@index([driverId])
+  @@index([status])
+  @@index([pickupDate])
+  @@index([createdAt])
+}
+
+model PickupPhoto {
+  id               String          @id @default(cuid())
+  pickupRequestId  String
+  type             PickupPhotoType
+  imageUrl         String
+  caption          String?
+  createdAt        DateTime        @default(now())
+
+  pickupRequest PickupRequest @relation(fields: [pickupRequestId], references: [id], onDelete: Cascade)
+
+  @@index([pickupRequestId])
+  @@index([type])
+}
+
+model PickupStatusLog {
+  id              String       @id @default(cuid())
+  pickupRequestId String
+  status          PickupStatus
+  message         String
+  location        String?
+  createdBy       String?
+  createdAt       DateTime     @default(now())
+
+  pickupRequest PickupRequest @relation(fields: [pickupRequestId], references: [id], onDelete: Cascade)
+
+  @@index([pickupRequestId])
+  @@index([status])
+  @@index([createdAt])
 }

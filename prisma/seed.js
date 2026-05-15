@@ -127,6 +127,225 @@ const goodsTypes = [
   "Fashion accessories",
 ];
 
+const drivers = [
+  {
+    driverCode: "DRV-260515-0001",
+    name: "Nguyen Van Tai",
+    phone: "0901 234 567",
+    email: "tai.driver@ezway.vn",
+    vehicleType: "MOTORBIKE",
+    vehiclePlate: "59A1-12345",
+    identityNumber: "123456789",
+    isActive: true,
+  },
+  {
+    driverCode: "DRV-260515-0002",
+    name: "Tran Minh Phuc",
+    phone: "0902 345 678",
+    email: "phuc.driver@ezway.vn",
+    vehicleType: "TRUCK",
+    vehiclePlate: "51C-67890",
+    identityNumber: "987654321",
+    isActive: true,
+  },
+  {
+    driverCode: "DRV-260515-0003",
+    name: "Le Hoang Nam",
+    phone: "0903 456 789",
+    email: "nam.driver@ezway.vn",
+    vehicleType: "VAN",
+    vehiclePlate: "50H-24680",
+    identityNumber: "456789123",
+    isActive: true,
+  },
+];
+
+const pickupStatuses = ["PENDING", "ASSIGNED", "ACCEPTED", "ON_THE_WAY", "ARRIVED", "PICKED_UP", "FAILED"];
+const vehicleTypes = ["MOTORBIKE", "CAR", "VAN", "TRUCK"];
+
+const pickupRequests = [
+  {
+    pickupCode: "PKP-260515-0001",
+    senderName: "Nguyen Minh Anh",
+    senderPhone: "0901 882 771",
+    senderAddress: "123 Nguyen Trai, Quan 3, TP. Ho Chi Minh",
+    senderWard: "Phuong 1",
+    senderDistrict: "Quan 3",
+    pickupDate: addDays(new Date("2026-05-15T00:00:00.000Z"), 0, 14),
+    pickupTimeWindow: "14:00 - 17:00",
+    vehicleType: "MOTORBIKE",
+    estimatedPackageCount: 2,
+    estimatedWeight: 5.5,
+    goodsDescription: "Cosmetics and fashion accessories",
+    pickupNote: "Call before arriving",
+    status: "PENDING",
+  },
+  {
+    pickupCode: "PKP-260515-0002",
+    senderName: "Tran Quoc Bao",
+    senderPhone: "0938 224 556",
+    senderAddress: "456 Le Duan, Cau Giay, Ha Noi",
+    senderWard: "Phuong Dich",
+    senderDistrict: "Cau Giay",
+    senderCity: "Ha Noi",
+    pickupDate: addDays(new Date("2026-05-15T00:00:00.000Z"), 1, 10),
+    pickupTimeWindow: "10:00 - 12:00",
+    vehicleType: "VAN",
+    estimatedPackageCount: 5,
+    estimatedWeight: 15.0,
+    goodsDescription: "Electronic components",
+    status: "ASSIGNED",
+    assignedAt: addDays(new Date("2026-05-15T00:00:00.000Z"), 0, 9),
+  },
+  {
+    pickupCode: "PKP-260515-0003",
+    senderName: "Pham Gia Han",
+    senderPhone: "0972 118 004",
+    senderAddress: "789 Tran Phu, Hai Chau, Da Nang",
+    senderWard: "Thach Thang",
+    senderDistrict: "Hai Chau",
+    senderCity: "Da Nang",
+    pickupDate: addDays(new Date("2026-05-15T00:00:00.000Z"), 2, 16),
+    pickupTimeWindow: "16:00 - 18:00",
+    vehicleType: "CAR",
+    estimatedPackageCount: 1,
+    estimatedWeight: 2.0,
+    goodsDescription: "Documents",
+    status: "ACCEPTED",
+    assignedAt: addDays(new Date("2026-05-15T00:00:00.000Z"), 1, 8),
+    acceptedAt: addDays(new Date("2026-05-15T00:00:00.000Z"), 1, 9),
+  },
+  {
+    pickupCode: "PKP-260515-0004",
+    senderName: "Le Thanh Tung",
+    senderPhone: "0909 332 180",
+    senderAddress: "321 Nguyen Thi Thap, Quan 7, TP. Ho Chi Minh",
+    senderWard: "Tan Hung",
+    senderDistrict: "Quan 7",
+    pickupDate: addDays(new Date("2026-05-15T00:00:00.000Z"), 0, 11),
+    pickupTimeWindow: "11:00 - 13:00",
+    vehicleType: "TRUCK",
+    estimatedPackageCount: 10,
+    estimatedWeight: 50.0,
+    goodsDescription: "Dry food products",
+    status: "ON_THE_WAY",
+    assignedAt: addDays(new Date("2026-05-15T00:00:00.000Z"), 0, 8),
+    acceptedAt: addDays(new Date("2026-05-15T00:00:00.000Z"), 0, 9),
+    onTheWayAt: addDays(new Date("2026-05-15T00:00:00.000Z"), 0, 10),
+  },
+  {
+    pickupCode: "PKP-260515-0005",
+    senderName: "Cong ty An Khang",
+    senderPhone: "028 7300 8866",
+    senderAddress: "654 Vo Van Ngan, Thu Duc, TP. Ho Chi Minh",
+    senderWard: "Linh Chieu",
+    senderDistrict: "Thu Duc",
+    pickupDate: addDays(new Date("2026-05-14T00:00:00.000Z"), 0, 15),
+    pickupTimeWindow: "15:00 - 17:00",
+    vehicleType: "VAN",
+    estimatedPackageCount: 3,
+    estimatedWeight: 8.0,
+    goodsDescription: "Fashion accessories",
+    status: "ARRIVED",
+    assignedAt: addDays(new Date("2026-05-14T00:00:00.000Z"), 0, 12),
+    acceptedAt: addDays(new Date("2026-05-14T00:00:00.000Z"), 0, 13),
+    onTheWayAt: addDays(new Date("2026-05-14T00:00:00.000Z"), 0, 14),
+    arrivedAt: addDays(new Date("2026-05-14T00:00:00.000Z"), 0, 15),
+  },
+  {
+    pickupCode: "PKP-260515-0006",
+    senderName: "Nguyen Van Tai",
+    senderPhone: "0901 234 567",
+    senderAddress: "987 Pham Ngoc Thach, Quan 3, TP. Ho Chi Minh",
+    senderWard: "Phuong 6",
+    senderDistrict: "Quan 3",
+    pickupDate: addDays(new Date("2026-05-13T00:00:00.000Z"), 0, 14),
+    pickupTimeWindow: "14:00 - 16:00",
+    vehicleType: "MOTORBIKE",
+    estimatedPackageCount: 1,
+    estimatedWeight: 1.5,
+    goodsDescription: "Documents and gifts",
+    status: "PICKED_UP",
+    assignedAt: addDays(new Date("2026-05-13T00:00:00.000Z"), 0, 11),
+    acceptedAt: addDays(new Date("2026-05-13T00:00:00.000Z"), 0, 12),
+    onTheWayAt: addDays(new Date("2026-05-13T00:00:00.000Z"), 0, 13),
+    arrivedAt: addDays(new Date("2026-05-13T00:00:00.000Z"), 0, 14),
+    pickedUpAt: addDays(new Date("2026-05-13T00:00:00.000Z"), 0, 15),
+    actualPackageCount: 1,
+    actualWeight: 1.8,
+  },
+  {
+    pickupCode: "PKP-260515-0007",
+    senderName: "Tran Minh Phuc",
+    senderPhone: "0902 345 678",
+    senderAddress: "147 Nguyen Van Cu, Quan 5, TP. Ho Chi Minh",
+    senderWard: "Phuong 4",
+    senderDistrict: "Quan 5",
+    pickupDate: addDays(new Date("2026-05-12T00:00:00.000Z"), 0, 9),
+    pickupTimeWindow: "09:00 - 11:00",
+    vehicleType: "TRUCK",
+    estimatedPackageCount: 8,
+    estimatedWeight: 35.0,
+    goodsDescription: "Electronic components",
+    status: "FAILED",
+    assignedAt: addDays(new Date("2026-05-12T00:00:00.000Z"), 0, 8),
+    acceptedAt: addDays(new Date("2026-05-12T00:00:00.000Z"), 0, 8),
+    onTheWayAt: addDays(new Date("2026-05-12T00:00:00.000Z"), 0, 9),
+    arrivedAt: addDays(new Date("2026-05-12T00:00:00.000Z"), 0, 9),
+    failedAt: addDays(new Date("2026-05-12T00:00:00.000Z"), 0, 10),
+    failedReason: "Customer not available at pickup location",
+  },
+  {
+    pickupCode: "PKP-260515-0008",
+    senderName: "Le Hoang Nam",
+    senderPhone: "0903 456 789",
+    senderAddress: "258 Tran Hung Dao, Quan 1, TP. Ho Chi Minh",
+    senderWard: "Phuong Nguyen Thai Binh",
+    senderDistrict: "Quan 1",
+    pickupDate: addDays(new Date("2026-05-16T00:00:00.000Z"), 0, 13),
+    pickupTimeWindow: "13:00 - 15:00",
+    vehicleType: "VAN",
+    estimatedPackageCount: 4,
+    estimatedWeight: 12.0,
+    goodsDescription: "Cosmetics",
+    status: "PENDING",
+  },
+  {
+    pickupCode: "PKP-260515-0009",
+    senderName: "Pham Gia Han",
+    senderPhone: "0972 118 004",
+    senderAddress: "369 Le Loi, Hai Chau, Da Nang",
+    senderWard: "Phuong Thach Thang",
+    senderDistrict: "Hai Chau",
+    senderCity: "Da Nang",
+    pickupDate: addDays(new Date("2026-05-17T00:00:00.000Z"), 0, 10),
+    pickupTimeWindow: "10:00 - 12:00",
+    vehicleType: "CAR",
+    estimatedPackageCount: 2,
+    estimatedWeight: 4.0,
+    goodsDescription: "Fashion accessories",
+    status: "ASSIGNED",
+    assignedAt: addDays(new Date("2026-05-15T00:00:00.000Z"), 0, 16),
+  },
+  {
+    pickupCode: "PKP-260515-0010",
+    senderName: "Cong ty An Khang",
+    senderPhone: "028 7300 8866",
+    senderAddress: "741 Vo Van Ngan, Thu Duc, TP. Ho Chi Minh",
+    senderWard: "Phuong Linh Chieu",
+    senderDistrict: "Thu Duc",
+    pickupDate: addDays(new Date("2026-05-18T00:00:00.000Z"), 0, 14),
+    pickupTimeWindow: "14:00 - 16:00",
+    vehicleType: "TRUCK",
+    estimatedPackageCount: 6,
+    estimatedWeight: 25.0,
+    goodsDescription: "Dry food",
+    status: "ACCEPTED",
+    assignedAt: addDays(new Date("2026-05-16T00:00:00.000Z"), 0, 9),
+    acceptedAt: addDays(new Date("2026-05-16T00:00:00.000Z"), 0, 10),
+  },
+];
+
 function addDays(baseDate, days, hour = 9) {
   const date = new Date(baseDate);
   date.setDate(date.getDate() + days);
@@ -217,6 +436,10 @@ async function main() {
   await prisma.costItem.deleteMany();
   await prisma.shippingService.deleteMany();
   await prisma.customer.deleteMany();
+  await prisma.pickupStatusLog.deleteMany();
+  await prisma.pickupPhoto.deleteMany();
+  await prisma.pickupRequest.deleteMany();
+  await prisma.driver.deleteMany();
 
   const createdShippingServices = [];
   for (const shippingService of shippingServices) {
@@ -339,6 +562,83 @@ async function main() {
             : undefined,
       },
     });
+  }
+
+  // Seed drivers
+  const createdDrivers = [];
+  for (const driver of drivers) {
+    createdDrivers.push(await prisma.driver.create({ data: driver }));
+  }
+
+  // Seed pickup requests
+  for (let index = 0; index < pickupRequests.length; index += 1) {
+    const pickup = pickupRequests[index];
+    const customer = createdCustomers.find(c => c.name === pickup.senderName);
+    const driver = pickup.status !== "PENDING" ? createdDrivers[index % createdDrivers.length] : null;
+
+    const pickupData = {
+      ...pickup,
+      customerId: customer ? customer.id : null,
+      driverId: driver ? driver.id : null,
+    };
+
+    const createdPickup = await prisma.pickupRequest.create({ data: pickupData });
+
+    // Create status log
+    let logMessage = "";
+    if (pickup.status === "PENDING") {
+      logMessage = "Yêu cầu pickup đã được tạo";
+    } else if (pickup.status === "ASSIGNED") {
+      logMessage = `Admin đã phân tài xế ${driver.name}`;
+    } else if (pickup.status === "ACCEPTED") {
+      logMessage = "Tài xế đã nhận nhiệm vụ";
+    } else if (pickup.status === "ON_THE_WAY") {
+      logMessage = "Tài xế đang đi lấy hàng";
+    } else if (pickup.status === "ARRIVED") {
+      logMessage = "Tài xế đã tới điểm lấy hàng";
+    } else if (pickup.status === "PICKED_UP") {
+      logMessage = "Tài xế đã lấy hàng thành công";
+    } else if (pickup.status === "FAILED") {
+      logMessage = `Pickup thất bại: ${pickup.failedReason}`;
+    }
+
+    await prisma.pickupStatusLog.create({
+      data: {
+        pickupRequestId: createdPickup.id,
+        status: pickup.status,
+        message: logMessage,
+      },
+    });
+
+    // Add some photos for completed pickups
+    if (pickup.status === "PICKED_UP") {
+      const photos = [
+        {
+          type: "GOODS",
+          imageUrl: "https://example.com/photo1.jpg",
+          caption: "Hàng hóa đã đóng gói",
+        },
+        {
+          type: "PACKAGE",
+          imageUrl: "https://example.com/photo2.jpg",
+          caption: "Kiện hàng",
+        },
+        {
+          type: "RECEIPT",
+          imageUrl: "https://example.com/photo3.jpg",
+          caption: "Biên nhận bàn giao",
+        },
+      ];
+
+      for (const photo of photos) {
+        await prisma.pickupPhoto.create({
+          data: {
+            pickupRequestId: createdPickup.id,
+            ...photo,
+          },
+        });
+      }
+    }
   }
 }
 

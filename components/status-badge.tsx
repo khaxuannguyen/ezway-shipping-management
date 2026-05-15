@@ -1,4 +1,4 @@
-import type { OrderStatus, PaymentStatus } from "@prisma/client";
+import type { OrderStatus, PaymentStatus, PickupStatus } from "@prisma/client";
 
 export const statusLabels: Record<OrderStatus, string> = {
   NEW: "Don moi",
@@ -18,6 +18,17 @@ export const paymentLabels: Record<PaymentStatus, string> = {
   PARTIAL: "Thanh toan mot phan",
   PAID: "Da thanh toan",
   OVERDUE: "Qua han",
+};
+
+export const pickupStatusLabels: Record<PickupStatus, string> = {
+  PENDING: "Cho phan tai xe",
+  ASSIGNED: "Da phan tai xe",
+  ACCEPTED: "Tai xe da nhan",
+  ON_THE_WAY: "Dang di lay",
+  ARRIVED: "Da toi diem lay",
+  PICKED_UP: "Da lay hang",
+  FAILED: "Lay that bai",
+  CANCELLED: "Da huy",
 };
 
 const orderClasses: Record<OrderStatus, string> = {
@@ -40,12 +51,45 @@ const paymentClasses: Record<PaymentStatus, string> = {
   OVERDUE: "bg-orange-50 text-orange-700 ring-orange-200",
 };
 
-export function StatusBadge({ status }: { status: OrderStatus }) {
+const pickupClasses: Record<PickupStatus, string> = {
+  PENDING: "bg-slate-100 text-slate-600 ring-slate-200",
+  ASSIGNED: "bg-blue-50 text-blue-700 ring-blue-200",
+  ACCEPTED: "bg-purple-50 text-purple-700 ring-purple-200",
+  ON_THE_WAY: "bg-yellow-50 text-yellow-700 ring-yellow-200",
+  ARRIVED: "bg-orange-50 text-orange-700 ring-orange-200",
+  PICKED_UP: "bg-green-50 text-green-700 ring-green-200",
+  FAILED: "bg-red-50 text-red-700 ring-red-200",
+  CANCELLED: "bg-slate-100 text-slate-600 ring-slate-200",
+};
+
+export function StatusBadge({
+  status,
+}: {
+  status: OrderStatus | PickupStatus;
+}) {
+  if (status in statusLabels) {
+    return (
+      <span
+        className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${orderClasses[status as OrderStatus]}`}
+      >
+        {statusLabels[status as OrderStatus]}
+      </span>
+    );
+  }
+
+  if (status in pickupStatusLabels) {
+    return (
+      <span
+        className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${pickupClasses[status as PickupStatus]}`}
+      >
+        {pickupStatusLabels[status as PickupStatus]}
+      </span>
+    );
+  }
+
   return (
-    <span
-      className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${orderClasses[status]}`}
-    >
-      {statusLabels[status]}
+    <span className="inline-flex items-center rounded-full bg-gray-50 px-2.5 py-1 text-xs font-semibold text-gray-700 ring-1 ring-gray-200">
+      {status}
     </span>
   );
 }

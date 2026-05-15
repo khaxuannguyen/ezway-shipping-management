@@ -9,6 +9,8 @@ const navItems = [
   { href: "/admin/services", label: "Dich vu" },
   { href: "/admin/cost-rates", label: "Gia goc" },
   { href: "/admin/cost-items", label: "Chi phi phu" },
+  { href: "/admin/pickups", label: "Pickup hang" },
+  { href: "/admin/drivers", label: "Tai xe" },
   { href: "/tracking", label: "Tracking public" },
 ];
 
@@ -38,7 +40,9 @@ export function AdminShell({ children }: { children: ReactNode }) {
         <header className="sticky top-0 z-10 border-b border-line bg-white/95 backdrop-blur">
           <div className="flex min-h-16 items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
             <div>
-              <div className="text-sm font-bold text-ink lg:hidden">EZWAY Ops</div>
+              <div className="text-sm font-bold text-ink lg:hidden">
+                EZWAY Ops
+              </div>
               <p className="text-xs font-medium text-slate-500 sm:text-sm">
                 Quan ly don hang, khach hang, van chuyen quoc te va tracking
               </p>
