@@ -112,11 +112,11 @@ const airUsPriorityCostRates = [
   ["300+kg", 299, null, "PER_KG", 235000],
 ];
 const costItems = [
-  ["Thung carton nho", 30000],
-  ["Thung carton lon", 50000],
-  ["Chi phi van hanh", 10000],
-  ["Dong goi chong soc", 50000],
-  ["Phi xu ly hang dac biet", 100000],
+  ["Thùng carton nhỏ", 30000],
+  ["Thùng carton lớn", 50000],
+  ["Chi phí vận hành", 10000],
+  ["Đóng gói chống sốc", 50000],
+  ["Phí xử lý hàng đặc biệt", 100000],
 ];
 const paymentStatuses = ["PAID", "UNPAID", "PARTIAL", "PAID", "UNPAID"];
 const goodsTypes = [

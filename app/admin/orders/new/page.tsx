@@ -20,7 +20,9 @@ function TextInput({
 }) {
   return (
     <label className="block">
-      <span className="mb-1 block text-sm font-semibold text-slate-700">{label}</span>
+      <span className="mb-1 block text-sm font-semibold text-slate-700">
+        {label}
+      </span>
       <input
         className="w-full rounded-md border border-line px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-blue-100"
         defaultValue={defaultValue}
@@ -65,7 +67,8 @@ export default async function NewOrderPage({
       <div>
         <h1 className="text-2xl font-bold text-ink">Tao don hang EZWAY</h1>
         <p className="mt-1 text-sm text-slate-600">
-          Tao order, package dau tien va tracking event NEW truc tiep vao database.
+          Tao order, package dau tien va tracking event NEW truc tiep vao
+          database.
         </p>
       </div>
 
@@ -87,7 +90,9 @@ export default async function NewOrderPage({
                 className="w-full rounded-md border border-line bg-white px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-blue-100"
                 name="customerId"
               >
-                <option value="">Tao nhanh khach hang moi bang thong tin ben duoi</option>
+                <option value="">
+                  Tao nhanh khach hang moi bang thong tin ben duoi
+                </option>
                 {customers.map((customer) => (
                   <option key={customer.id} value={customer.id}>
                     {customer.customerCode} - {customer.name} - {customer.phone}
@@ -95,10 +100,26 @@ export default async function NewOrderPage({
                 ))}
               </select>
             </label>
-            <TextInput label="Ten khach moi" name="customerName" placeholder="EZWAY Customer" />
-            <TextInput label="SDT khach moi" name="customerPhone" placeholder="0900 000 000" />
-            <TextInput label="Email khach moi" name="customerEmail" placeholder="customer@example.com" />
-            <TextInput label="Dia chi khach moi" name="customerAddress" placeholder="Ho Chi Minh City" />
+            <TextInput
+              label="Ten khach moi"
+              name="customerName"
+              placeholder="EZWAY Customer"
+            />
+            <TextInput
+              label="SDT khach moi"
+              name="customerPhone"
+              placeholder="0900 000 000"
+            />
+            <TextInput
+              label="Email khach moi"
+              name="customerEmail"
+              placeholder="customer@example.com"
+            />
+            <TextInput
+              label="Dia chi khach moi"
+              name="customerAddress"
+              placeholder="Ho Chi Minh City"
+            />
           </div>
         </section>
 
@@ -107,7 +128,11 @@ export default async function NewOrderPage({
           <div className="mt-4 grid gap-4 md:grid-cols-3">
             <TextInput label="Ten nguoi gui" name="senderName" required />
             <TextInput label="SDT nguoi gui" name="senderPhone" required />
-            <TextInput label="Dia chi nguoi gui" name="senderAddress" required />
+            <TextInput
+              label="Dia chi nguoi gui"
+              name="senderAddress"
+              required
+            />
           </div>
         </section>
 
@@ -116,17 +141,35 @@ export default async function NewOrderPage({
           <div className="mt-4 grid gap-4 md:grid-cols-3">
             <TextInput label="Ten nguoi nhan" name="receiverName" required />
             <TextInput label="SDT nguoi nhan" name="receiverPhone" required />
-            <TextInput label="Dia chi nguoi nhan" name="receiverAddress" required />
+            <TextInput
+              label="Dia chi nguoi nhan"
+              name="receiverAddress"
+              required
+            />
           </div>
         </section>
 
         <section className="rounded-lg border border-line bg-white p-5 shadow-soft">
-          <h2 className="text-base font-semibold text-ink">Thong tin van chuyen</h2>
+          <h2 className="text-base font-semibold text-ink">
+            Thong tin van chuyen
+          </h2>
           <div className="mt-4 grid gap-4 md:grid-cols-4">
-            <TextInput label="Quoc gia gui" name="originCountry" defaultValue="Vietnam" required />
-            <TextInput label="Quoc gia nhan" name="destinationCountry" placeholder="United States" required />
+            <TextInput
+              label="Quoc gia gui"
+              name="originCountry"
+              defaultValue="Vietnam"
+              required
+            />
+            <TextInput
+              label="Quoc gia nhan"
+              name="destinationCountry"
+              placeholder="United States"
+              required
+            />
             <label className="block">
-              <span className="mb-1 block text-sm font-semibold text-slate-700">Dich vu EZWAY</span>
+              <span className="mb-1 block text-sm font-semibold text-slate-700">
+                Dich vu EZWAY
+              </span>
               <select
                 className="w-full rounded-md border border-line bg-white px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-blue-100"
                 name="shippingServiceId"
@@ -140,15 +183,77 @@ export default async function NewOrderPage({
                 ))}
               </select>
             </label>
-            <TextInput label="Loai hang hoa" name="goodsType" placeholder="Documents" required />
+            <TextInput
+              label="Loai hang hoa"
+              name="goodsType"
+              placeholder="Documents"
+              required
+            />
           </div>
         </section>
 
         <section className="rounded-lg border border-line bg-white p-5 shadow-soft">
-          <h2 className="text-base font-semibold text-ink">Can nang va kich thuoc</h2>
+          <h2 className="text-base font-semibold text-ink">
+            Phuong thuc lay hang
+          </h2>
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
+            <label className="block">
+              <span className="mb-1 block text-sm font-semibold text-slate-700">
+                Chon phuong thuc lay hang
+              </span>
+              <select
+                className="w-full rounded-md border border-line bg-white px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-blue-100"
+                name="pickupMethod"
+                defaultValue="NONE"
+              >
+                <option value="NONE">Chua xac dinh</option>
+                <option value="EZWAY_PICKUP">EZWAY pickup</option>
+                <option value="CUSTOMER_DROP_OFF">Khach tu dem den</option>
+                <option value="THIRD_PARTY">Don vi ngoai</option>
+              </select>
+            </label>
+          </div>
+          <div
+            id="thirdPartyFields"
+            className="mt-4 hidden grid gap-4 md:grid-cols-3"
+          >
+            <TextInput
+              label="Nha cung cap"
+              name="thirdPartyPickupProvider"
+              placeholder="Grab, Ahamove, ..."
+            />
+            <TextInput
+              label="Chi phi pickup (VND)"
+              name="thirdPartyPickupFee"
+              type="number"
+              defaultValue={0}
+            />
+            <TextInput
+              label="Ghi chu"
+              name="thirdPartyPickupNote"
+              placeholder="Chi tiet ve nha cung cap..."
+            />
+          </div>
+        </section>
+
+        <section className="rounded-lg border border-line bg-white p-5 shadow-soft">
+          <h2 className="text-base font-semibold text-ink">
+            Can nang va kich thuoc
+          </h2>
           <div className="mt-4 grid gap-4 md:grid-cols-5">
-            <TextInput label="So kien" name="packageCount" type="number" defaultValue={1} required />
-            <TextInput label="Can nang thuc te kg" name="actualWeight" type="number" required />
+            <TextInput
+              label="So kien"
+              name="packageCount"
+              type="number"
+              defaultValue={1}
+              required
+            />
+            <TextInput
+              label="Can nang thuc te kg"
+              name="actualWeight"
+              type="number"
+              required
+            />
             <TextInput label="Dai cm" name="length" type="number" required />
             <TextInput label="Rong cm" name="width" type="number" required />
             <TextInput label="Cao cm" name="height" type="number" required />
@@ -158,13 +263,30 @@ export default async function NewOrderPage({
         <section className="rounded-lg border border-line bg-white p-5 shadow-soft">
           <h2 className="text-base font-semibold text-ink">Chi phi</h2>
           <p className="mt-1 text-sm text-slate-600">
-            He thong se tinh can nang quy doi, can nang tinh cuoc, gia goc va loi nhuan khi submit.
-            Neu chua co gia goc phu hop, baseCost se bang 0 va can bo admin can bo sung bang gia.
+            He thong se tinh can nang quy doi, can nang tinh cuoc, gia goc va
+            loi nhuan khi submit. Neu chua co gia goc phu hop, baseCost se bang
+            0 va can bo admin can bo sung bang gia.
           </p>
           <div className="mt-4 grid gap-4 md:grid-cols-3">
-            <TextInput label="Gia ban cho khach" name="totalFee" type="number" defaultValue={0} required />
-            <TextInput label="Phu phi ban ra" name="surchargeFee" type="number" defaultValue={0} />
-            <TextInput label="Giam gia" name="discountFee" type="number" defaultValue={0} />
+            <TextInput
+              label="Gia ban cho khach"
+              name="totalFee"
+              type="number"
+              defaultValue={0}
+              required
+            />
+            <TextInput
+              label="Phu phi ban ra"
+              name="surchargeFee"
+              type="number"
+              defaultValue={0}
+            />
+            <TextInput
+              label="Giam gia"
+              name="discountFee"
+              type="number"
+              defaultValue={0}
+            />
           </div>
         </section>
 
@@ -192,6 +314,28 @@ export default async function NewOrderPage({
           </button>
         </div>
       </form>
+
+      <script>
+        {`
+          const pickupMethodSelect = document.querySelector('select[name="pickupMethod"]');
+          const thirdPartyFields = document.getElementById('thirdPartyFields');
+          
+          if (pickupMethodSelect && thirdPartyFields) {
+            const updateFieldsVisibility = () => {
+              if (pickupMethodSelect.value === 'THIRD_PARTY') {
+                thirdPartyFields.classList.remove('hidden');
+                thirdPartyFields.classList.add('grid');
+              } else {
+                thirdPartyFields.classList.remove('grid');
+                thirdPartyFields.classList.add('hidden');
+              }
+            };
+            
+            pickupMethodSelect.addEventListener('change', updateFieldsVisibility);
+            updateFieldsVisibility();
+          }
+        `}
+      </script>
     </div>
   );
 }

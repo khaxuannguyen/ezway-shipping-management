@@ -6,7 +6,7 @@ import { OrderTable, type OrderTableRow } from "@/components/order-table";
 import { statusLabels } from "@/components/status-badge";
 
 const filterOptions: Array<{ value: "all" | OrderStatus; label: string }> = [
-  { value: "all", label: "Tat ca trang thai" },
+  { value: "all", label: "Tất cả trạng thái" },
   { value: "NEW", label: statusLabels.NEW },
   { value: "CONFIRMED", label: statusLabels.CONFIRMED },
   { value: "IN_WAREHOUSE", label: statusLabels.IN_WAREHOUSE },
@@ -51,21 +51,27 @@ export function OrdersClient({ orders }: { orders: OrderTableRow[] }) {
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-3 rounded-lg border border-line bg-white p-4 shadow-soft md:grid-cols-[1fr_240px]">
+      <div className="grid gap-3 rounded-lg border border-slate-200 bg-white p-4 shadow-sm md:grid-cols-[1fr_240px]">
         <label className="block">
-          <span className="mb-1 block text-sm font-semibold text-slate-700">Tim kiem</span>
+          <span className="mb-1 block text-sm font-medium text-slate-700">
+            Tìm kiếm
+          </span>
           <input
-            className="w-full rounded-md border border-line px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-blue-100"
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             onChange={(event) => setKeyword(event.target.value)}
-            placeholder="Ma don, tracking, khach hang, nguoi nhan"
+            placeholder="Mã đơn, tracking, khách hàng, người nhận"
             value={keyword}
           />
         </label>
         <label className="block">
-          <span className="mb-1 block text-sm font-semibold text-slate-700">Trang thai</span>
+          <span className="mb-1 block text-sm font-medium text-slate-700">
+            Trạng thái
+          </span>
           <select
-            className="w-full rounded-md border border-line bg-white px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-blue-100"
-            onChange={(event) => setStatus(event.target.value as "all" | OrderStatus)}
+            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            onChange={(event) =>
+              setStatus(event.target.value as "all" | OrderStatus)
+            }
             value={status}
           >
             {filterOptions.map((option) => (
@@ -78,7 +84,7 @@ export function OrdersClient({ orders }: { orders: OrderTableRow[] }) {
       </div>
 
       <div className="text-sm font-medium text-slate-600">
-        Hien thi {filteredOrders.length} / {orders.length} don hang
+        Hiển thị {filteredOrders.length} / {orders.length} đơn hàng
       </div>
       <OrderTable orders={filteredOrders} />
     </div>

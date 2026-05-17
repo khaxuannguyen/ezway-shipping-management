@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { formatDateTime } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
 import { DEFAULT_COST_RATE_ROWS } from "../weight-rows";
+import { PageHeader } from "@/components/page-header";
 
 export const dynamic = "force-dynamic";
 
@@ -51,29 +52,20 @@ export default async function CostRateServicePage({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-ink">
-            Bảng giá: {service.code}
-          </h1>
-          <p className="mt-1 text-sm text-slate-600">
-            Chi tiết bảng giá của dịch vụ.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Link
-            className="rounded-3xl border border-line bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-            href="/admin/cost-rates"
-          >
-            Quay lại danh sách
-          </Link>
-          <Link
-            className="rounded-3xl bg-brand px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
-            href={`/admin/cost-rates/${service.id}/edit`}
-          >
-            Sửa bảng giá
-          </Link>
-        </div>
+      <PageHeader
+        title={`Bảng giá: ${service.code}`}
+        description="Chi tiết bảng giá của dịch vụ."
+        actionLabel="Sửa bảng giá"
+        actionHref={`/admin/cost-rates/${service.id}/edit`}
+      />
+
+      <div className="flex justify-end">
+        <Link
+          className="rounded-3xl border border-line bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+          href="/admin/cost-rates"
+        >
+          Quay lại danh sách
+        </Link>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">

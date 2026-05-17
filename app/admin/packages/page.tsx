@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { PackagesClient } from "./packages-client";
+import { PageHeader } from "@/components/page-header";
 
 export const dynamic = "force-dynamic";
 
@@ -31,20 +31,12 @@ export default async function PackagesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-ink">Kien hang</h1>
-          <p className="mt-1 text-sm text-slate-600">
-            Quan ly package, kich thuoc va can nang tinh cuoc trong kho EZWAY.
-          </p>
-        </div>
-        <Link
-          className="w-fit rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
-          href="/admin/packages/new"
-        >
-          Tao kien hang
-        </Link>
-      </div>
+      <PageHeader
+        title="Kiện hàng"
+        description="Quản lý package, kích thước và cân nặng tính cước trong kho EZWAY."
+        actionLabel="Tạo kiện hàng"
+        actionHref="/admin/packages/new"
+      />
 
       <PackagesClient packages={rows} />
     </div>

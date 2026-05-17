@@ -1,4 +1,4 @@
-export function formatCurrency(value: number) {
+export function formatCurrencyVND(value: number) {
   return new Intl.NumberFormat("vi-VN", {
     style: "currency",
     currency: "VND",
@@ -23,3 +23,10 @@ export function formatDateTime(value: Date | string) {
     minute: "2-digit",
   }).format(new Date(value));
 }
+
+export function formatWeight(value: number) {
+  return `${value.toFixed(1)} kg`;
+}
+
+// Legacy alias for backward compatibility
+export const formatCurrency = formatCurrencyVND;

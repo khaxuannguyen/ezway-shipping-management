@@ -3,6 +3,7 @@
 import {
   OrderStatus,
   PaymentStatus,
+  PickupMethod,
   Prisma,
   ServiceType,
   ShippingTransportType,
@@ -201,6 +202,27 @@ export async function createOrder(formData: FormData) {
     const volumetricWeight = calculateVolumetricWeight(length, width, height);
     const chargeableWeight = calculateChargeableWeight(actualWeight, length, width, height);
 
+    const pickupMethod = getEnumValue(
+      getText(formData, "pickupMethod") || "NONE",
+      ["NONE", "EZWAY_PICKUP", "CUSTOMER_DROP_OFF", "THIRD_PARTY"],
+      "Pickup method",
+    ) as PickupMethod;
+
+    const thirdPartyPickupProvider =
+      pickupMethod === PickupMethod.THIRD_PARTY
+        ? getOptionalText(formData, "thirdPartyPickupProvider")
+        : null;
+
+    const thirdPartyPickupFee =
+      pickupMethod === PickupMethod.THIRD_PARTY
+        ? getOptionalNumber(formData, "thirdPartyPickupFee", 0)
+        : 0;
+
+    const thirdPartyPickupNote =
+      pickupMethod === PickupMethod.THIRD_PARTY
+        ? getOptionalText(formData, "thirdPartyPickupNote")
+        : null;
+
     if (totalFee < 0) {
       throw new Error("Total fee cannot be negative.");
     }
@@ -230,7 +252,11 @@ export async function createOrder(formData: FormData) {
         orderBy: [{ sortOrder: "asc" }, { minWeight: "asc" }],
       });
       const baseCost = calculateBaseCost(costRate, chargeableWeight);
-      const extraCostTotal = 0;
+      const pickupExtraCostAmount =
+        pickupMethod === PickupMethod.THIRD_PARTY && thirdPartyPickupFee > 0
+          ? thirdPartyPickupFee
+          : 0;
+      const extraCostTotal = pickupExtraCostAmount;
       const profit = calculateOrderProfit(totalFee, baseCost, extraCostTotal);
 
       const customerId =
@@ -277,6 +303,10 @@ export async function createOrder(formData: FormData) {
           paymentStatus: PaymentStatus.UNPAID,
           status: OrderStatus.NEW,
           internalNote: getOptionalText(formData, "internalNote"),
+          pickupMethod,
+          thirdPartyPickupProvider,
+          thirdPartyPickupFee: Math.round(thirdPartyPickupFee),
+          thirdPartyPickupNote,
           packages: {
             create: {
               packageCode: await generatePackageCode(tx),
@@ -297,6 +327,16 @@ export async function createOrder(formData: FormData) {
               eventTime: new Date(),
             },
           },
+          ...(pickupMethod === PickupMethod.THIRD_PARTY &&
+          thirdPartyPickupFee > 0 && {
+            extraCosts: {
+              create: {
+                name: `Pickup (${thirdPartyPickupProvider || "Third Party"})`,
+                amount: thirdPartyPickupFee,
+                note: thirdPartyPickupNote || undefined,
+              },
+            },
+          }),
         },
         select: { id: true },
       });

@@ -66,6 +66,13 @@ enum VehicleType {
   OTHER
 }
 
+enum PickupMethod {
+  NONE
+  EZWAY_PICKUP
+  CUSTOMER_DROP_OFF
+  THIRD_PARTY
+}
+
 enum PickupPhotoType {
   GOODS
   PACKAGE
@@ -119,6 +126,10 @@ model Order {
   paymentStatus      PaymentStatus @default(UNPAID)
   status             OrderStatus   @default(NEW)
   internalNote       String?
+  pickupMethod       PickupMethod  @default(NONE)
+  thirdPartyPickupProvider String?
+  thirdPartyPickupFee Float        @default(0)
+  thirdPartyPickupNote String?
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
 

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { formatDateTime } from "@/lib/format";
 import { StatusBadge } from "@/components/status-badge";
+import { PageHeader } from "@/components/page-header";
 import type { PickupStatus } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
@@ -38,20 +39,12 @@ export default async function PickupsPage({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-ink">Pickup hàng</h1>
-          <p className="mt-1 text-sm text-slate-600">
-            Quản lý yêu cầu pickup hàng tại nhà khách
-          </p>
-        </div>
-        <Link
-          className="rounded-3xl border border-line bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-          href="/admin/pickups/new"
-        >
-          Tạo pickup
-        </Link>
-      </div>
+      <PageHeader
+        title="Pickup hàng"
+        description="Quản lý yêu cầu pickup hàng tại nhà khách"
+        actionLabel="Tạo pickup"
+        actionHref="/admin/pickups/new"
+      />
 
       {/* Filters */}
       <div className="rounded-lg border border-line bg-white p-4">

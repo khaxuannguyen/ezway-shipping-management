@@ -1,8 +1,8 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { CostRateNewForm } from "../../new/cost-rate-new-form";
 import { DEFAULT_COST_RATE_ROWS } from "../../weight-rows";
+import { PageHeader } from "@/components/page-header";
 
 export const dynamic = "force-dynamic";
 
@@ -36,20 +36,12 @@ export default async function EditServiceCostRatePage({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-ink">Sửa bảng giá gốc</h1>
-          <p className="mt-1 text-sm text-slate-600">
-            Cập nhật bảng giá cho dịch vụ {service.code}.
-          </p>
-        </div>
-        <Link
-          className="rounded-3xl border border-line bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-          href={`/admin/cost-rates/${service.id}`}
-        >
-          Quay lại chi tiết
-        </Link>
-      </div>
+      <PageHeader
+        title="Sửa bảng giá gốc"
+        description={`Cập nhật bảng giá cho dịch vụ ${service.code}.`}
+        actionLabel="Quay lại chi tiết"
+        actionHref={`/admin/cost-rates/${service.id}`}
+      />
 
       <CostRateNewForm
         services={[{ id: service.id, code: service.code, name: service.name }]}

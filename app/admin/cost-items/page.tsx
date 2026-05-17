@@ -1,34 +1,70 @@
 import Link from "next/link";
-import { formatCurrency } from "@/lib/format";
+import { formatCurrencyVND } from "@/lib/format";
 import { prisma } from "@/lib/prisma";
+import { PageHeader } from "@/components/page-header";
+import { ActiveBadge } from "@/components/status-badge";
 
 export const dynamic = "force-dynamic";
 
 export default async function CostItemsPage() {
-  const items = await prisma.costItem.findMany({ orderBy: { createdAt: "desc" } });
+  const items = await prisma.costItem.findMany({
+    orderBy: { createdAt: "desc" },
+  });
+
   return (
     <div className="space-y-6">
-      <div className="flex items-end justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-ink">Chi phi phu</h1>
-          <p className="mt-1 text-sm text-slate-600">Danh muc chi phi phu ap vao don hang.</p>
-        </div>
-        <Link className="rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white" href="/admin/cost-items/new">Tao chi phi</Link>
-      </div>
-      <div className="overflow-hidden rounded-lg border border-line bg-white shadow-soft">
+      <PageHeader
+        title="Chi phí phụ"
+        description="Quản lý các khoản chi phí phụ áp dụng vào đơn hàng"
+        actionLabel="Tạo chi phí"
+        actionHref="/admin/cost-items/new"
+      />
+
+      <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-line text-sm">
-            <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-              <tr><th className="px-5 py-3">Ten chi phi</th><th className="px-5 py-3 text-right">Gia mac dinh</th><th className="px-5 py-3">Mo ta</th><th className="px-5 py-3">Status</th><th className="px-5 py-3 text-right">Sua</th></tr>
+          <table className="w-full text-sm">
+            <thead className="bg-slate-50">
+              <tr>
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">
+                  Tên chi phí
+                </th>
+                <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-slate-500">
+                  Giá mặc định
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">
+                  Mô tả
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-slate-500">
+                  Trạng thái
+                </th>
+                <th className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wide text-slate-500">
+                  Hành động
+                </th>
+              </tr>
             </thead>
-            <tbody className="divide-y divide-line">
+            <tbody className="divide-y divide-slate-200">
               {items.map((item) => (
                 <tr key={item.id} className="hover:bg-slate-50">
-                  <td className="px-5 py-4 font-semibold">{item.name}</td>
-                  <td className="px-5 py-4 text-right">{formatCurrency(item.defaultAmount)}</td>
-                  <td className="px-5 py-4 text-slate-600">{item.description ?? "-"}</td>
-                  <td className="px-5 py-4">{item.isActive ? "Active" : "Inactive"}</td>
-                  <td className="px-5 py-4 text-right"><Link className="rounded-md border border-line px-3 py-2 text-xs font-semibold text-brand" href={`/admin/cost-items/${item.id}/edit`}>Sua</Link></td>
+                  <td className="px-4 py-3 font-medium text-slate-900">
+                    {item.name}
+                  </td>
+                  <td className="px-4 py-3 text-right font-medium text-slate-900">
+                    {formatCurrencyVND(item.defaultAmount)}
+                  </td>
+                  <td className="px-4 py-3 text-slate-600">
+                    {item.description ?? "-"}
+                  </td>
+                  <td className="px-4 py-3">
+                    <ActiveBadge status={item.isActive} />
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <Link
+                      className="inline-flex items-center rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                      href={`/admin/cost-items/${item.id}/edit`}
+                    >
+                      Sửa
+                    </Link>
+                  </td>
                 </tr>
               ))}
             </tbody>

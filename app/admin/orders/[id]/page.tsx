@@ -13,6 +13,7 @@ import {
   updateOrderStatus,
   updatePaymentStatus,
 } from "../actions";
+import OrderProcessFlow from "@/components/order-process-flow";
 
 export const dynamic = "force-dynamic";
 
@@ -56,15 +57,36 @@ export default async function OrderDetailPage({
     notFound();
   }
 
+  // try find pickup related to this order (if any)
+  const pickup = await prisma.pickupRequest.findFirst({
+    where: { orderId: order.id },
+    include: { driver: true },
+  });
+
   return (
     <div className="space-y-6">
+      <section>
+        <h2 className="text-base font-semibold text-ink">
+          Quy trình xử lý đơn hàng
+        </h2>
+        <div className="mt-3">
+          <OrderProcessFlow data={{ ...order, pickup }} />
+        </div>
+      </section>
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <Link className="text-sm font-semibold text-brand hover:text-blue-700" href="/admin/orders">
+          <Link
+            className="text-sm font-semibold text-brand hover:text-blue-700"
+            href="/admin/orders"
+          >
             {"<-"} Quay lai danh sach
           </Link>
-          <h1 className="mt-2 text-2xl font-bold text-ink">{order.orderCode}</h1>
-          <p className="mt-1 text-sm text-slate-600">Tracking: {order.trackingCode}</p>
+          <h1 className="mt-2 text-2xl font-bold text-ink">
+            {order.orderCode}
+          </h1>
+          <p className="mt-1 text-sm text-slate-600">
+            Tracking: {order.trackingCode}
+          </p>
         </div>
         <div className="flex flex-wrap gap-2">
           <StatusBadge status={order.status} />
@@ -80,20 +102,41 @@ export default async function OrderDetailPage({
               <InfoRow label="Ma khach" value={order.customer.customerCode} />
               <InfoRow label="SDT" value={order.customer.phone} />
               <InfoRow label="Email" value={order.customer.email ?? "-"} />
-              <InfoRow label="Ngay tao" value={formatDateTime(order.createdAt)} />
+              <InfoRow
+                label="Ngay tao"
+                value={formatDateTime(order.createdAt)}
+              />
               <InfoRow label="Ghi chu" value={order.internalNote ?? "-"} />
             </InfoCard>
 
             <InfoCard title="Thong tin van chuyen">
-              <InfoRow label="Tuyen" value={`${order.originCountry} -> ${order.destinationCountry}`} />
+              <InfoRow
+                label="Tuyen"
+                value={`${order.originCountry} -> ${order.destinationCountry}`}
+              />
               <InfoRow label="Dich vu cu" value={order.serviceType} />
-              <InfoRow label="Ma dich vu" value={order.shippingService?.code ?? "-"} />
-              <InfoRow label="Ten dich vu" value={order.shippingService?.name ?? "-"} />
-              <InfoRow label="Loai van chuyen" value={order.shippingService?.transportType ?? "-"} />
-              <InfoRow label="Khu vuc dich" value={order.shippingService?.destinationZone ?? "-"} />
+              <InfoRow
+                label="Ma dich vu"
+                value={order.shippingService?.code ?? "-"}
+              />
+              <InfoRow
+                label="Ten dich vu"
+                value={order.shippingService?.name ?? "-"}
+              />
+              <InfoRow
+                label="Loai van chuyen"
+                value={order.shippingService?.transportType ?? "-"}
+              />
+              <InfoRow
+                label="Khu vuc dich"
+                value={order.shippingService?.destinationZone ?? "-"}
+              />
               <InfoRow label="Loai hang" value={order.goodsType} />
               <InfoRow label="So kien" value={order.packageCount} />
-              <InfoRow label="Can nang tinh phi" value={`${order.chargeableWeight} kg`} />
+              <InfoRow
+                label="Can nang tinh phi"
+                value={`${order.chargeableWeight} kg`}
+              />
             </InfoCard>
           </div>
 
@@ -111,43 +154,200 @@ export default async function OrderDetailPage({
             </InfoCard>
           </div>
 
+          <div className="rounded-lg border border-line bg-white p-5 shadow-soft">
+            <h2 className="text-base font-semibold text-ink">
+              Pickup / Lay hang
+            </h2>
+            <div className="mt-4 space-y-4">
+              {order.pickupMethod === "NONE" && (
+                <p className="text-sm text-slate-600">
+                  Chua xac dinh phuong thuc lay hang
+                </p>
+              )}
+
+              {order.pickupMethod === "CUSTOMER_DROP_OFF" && (
+                <div>
+                  <p className="text-sm font-semibold text-ink">
+                    Phuong thuc: Khach tu dem den
+                  </p>
+                  <p className="mt-1 text-sm text-slate-600">
+                    Khach hang se tu dem hang den kho EZWAY
+                  </p>
+                </div>
+              )}
+
+              {order.pickupMethod === "EZWAY_PICKUP" && (
+                <div>
+                  <p className="text-sm font-semibold text-ink">
+                    Phuong thuc: EZWAY Pickup
+                  </p>
+                  {pickup ? (
+                    <div className="mt-2 space-y-2">
+                      <p className="text-sm text-slate-600">
+                        <span className="font-semibold">Ma yeu cau:</span>{" "}
+                        {pickup.pickupCode}
+                      </p>
+                      <p className="text-sm text-slate-600">
+                        <span className="font-semibold">Trang thai:</span>{" "}
+                        {pickup.status}
+                      </p>
+                      {pickup.driver && (
+                        <p className="text-sm text-slate-600">
+                          <span className="font-semibold">Tai xe:</span>{" "}
+                          {pickup.driver.name} ({pickup.driver.phone})
+                        </p>
+                      )}
+                      <Link
+                        className="inline-block rounded-md border border-brand px-3 py-2 text-xs font-semibold text-brand hover:bg-blue-50"
+                        href={`/admin/pickups/${pickup.id}`}
+                      >
+                        Xem chi tiet yeu cau pickup
+                      </Link>
+                    </div>
+                  ) : (
+                    <div className="mt-2 space-y-2">
+                      <p className="text-sm text-slate-600">
+                        Chua tao yeu cau pickup
+                      </p>
+                      <Link
+                        className="inline-block rounded-md border border-brand px-3 py-2 text-xs font-semibold text-brand hover:bg-blue-50"
+                        href={`/admin/pickups/new?orderId=${order.id}`}
+                      >
+                        Tao yeu cau pickup
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {order.pickupMethod === "THIRD_PARTY" && (
+                <div>
+                  <p className="text-sm font-semibold text-ink">
+                    Phuong thuc: Don vi ngoai
+                  </p>
+                  <div className="mt-2 space-y-2">
+                    {order.thirdPartyPickupProvider && (
+                      <p className="text-sm text-slate-600">
+                        <span className="font-semibold">Nha cung cap:</span>{" "}
+                        {order.thirdPartyPickupProvider}
+                      </p>
+                    )}
+                    {order.thirdPartyPickupFee > 0 && (
+                      <p className="text-sm text-slate-600">
+                        <span className="font-semibold">Chi phi:</span>{" "}
+                        {formatCurrency(order.thirdPartyPickupFee)}
+                      </p>
+                    )}
+                    {order.thirdPartyPickupNote && (
+                      <p className="text-sm text-slate-600">
+                        <span className="font-semibold">Ghi chu:</span>{" "}
+                        {order.thirdPartyPickupNote}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
           <InfoCard title="Phi va thanh toan">
             <InfoRow label="Gia ban" value={formatCurrency(order.totalFee)} />
-            <InfoRow label="Gia goc dich vu" value={formatCurrency(order.baseCost)} />
-            <InfoRow label="Chi phi phu" value={formatCurrency(order.extraCostTotal)} />
+            <InfoRow
+              label="Gia goc dich vu"
+              value={formatCurrency(order.baseCost)}
+            />
+            <InfoRow
+              label="Chi phi phu"
+              value={formatCurrency(order.extraCostTotal)}
+            />
             <InfoRow label="Loi nhuan" value={formatCurrency(order.profit)} />
-            <InfoRow label="Phi co ban cu" value={formatCurrency(order.baseFee)} />
-            <InfoRow label="Phu phi" value={formatCurrency(order.surchargeFee)} />
-            <InfoRow label="Giam gia" value={formatCurrency(order.discountFee)} />
+            <InfoRow
+              label="Phi co ban cu"
+              value={formatCurrency(order.baseFee)}
+            />
+            <InfoRow
+              label="Phu phi"
+              value={formatCurrency(order.surchargeFee)}
+            />
+            <InfoRow
+              label="Giam gia"
+              value={formatCurrency(order.discountFee)}
+            />
             <InfoRow label="Tong phi" value={formatCurrency(order.totalFee)} />
-            <InfoRow label="Trang thai" value={<PaymentBadge status={order.paymentStatus} />} />
+            <InfoRow
+              label="Trang thai"
+              value={<PaymentBadge status={order.paymentStatus} />}
+            />
           </InfoCard>
 
           <section className="rounded-lg border border-line bg-white p-5 shadow-soft">
-            <h2 className="text-base font-semibold text-ink">Chi phi & loi nhuan</h2>
+            <h2 className="text-base font-semibold text-ink">
+              Chi phi & loi nhuan
+            </h2>
             <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              <div><p className="text-sm text-slate-500">Gia ban</p><p className="mt-1 font-bold">{formatCurrency(order.totalFee)}</p></div>
-              <div><p className="text-sm text-slate-500">Gia goc</p><p className="mt-1 font-bold">{formatCurrency(order.baseCost)}</p></div>
-              <div><p className="text-sm text-slate-500">Chi phi phu</p><p className="mt-1 font-bold">{formatCurrency(order.extraCostTotal)}</p></div>
-              <div><p className="text-sm text-slate-500">Loi nhuan</p><p className="mt-1 font-bold text-ocean">{formatCurrency(order.profit)}</p></div>
+              <div>
+                <p className="text-sm text-slate-500">Gia ban</p>
+                <p className="mt-1 font-bold">
+                  {formatCurrency(order.totalFee)}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-slate-500">Gia goc</p>
+                <p className="mt-1 font-bold">
+                  {formatCurrency(order.baseCost)}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-slate-500">Chi phi phu</p>
+                <p className="mt-1 font-bold">
+                  {formatCurrency(order.extraCostTotal)}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-slate-500">Loi nhuan</p>
+                <p className="mt-1 font-bold text-ocean">
+                  {formatCurrency(order.profit)}
+                </p>
+              </div>
             </div>
             <div className="mt-5 overflow-x-auto">
               <table className="min-w-full divide-y divide-line text-sm">
                 <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  <tr><th className="px-4 py-3">Name</th><th className="px-4 py-3 text-right">Amount</th><th className="px-4 py-3">Note</th><th className="px-4 py-3">Created</th><th className="px-4 py-3 text-right">Action</th></tr>
+                  <tr>
+                    <th className="px-4 py-3">Name</th>
+                    <th className="px-4 py-3 text-right">Amount</th>
+                    <th className="px-4 py-3">Note</th>
+                    <th className="px-4 py-3">Created</th>
+                    <th className="px-4 py-3 text-right">Action</th>
+                  </tr>
                 </thead>
                 <tbody className="divide-y divide-line">
                   {order.extraCosts.map((item) => (
                     <tr key={item.id}>
                       <td className="px-4 py-3 font-semibold">{item.name}</td>
-                      <td className="px-4 py-3 text-right">{formatCurrency(item.amount)}</td>
-                      <td className="px-4 py-3 text-slate-600">{item.note ?? "-"}</td>
-                      <td className="px-4 py-3 text-slate-600">{formatDateTime(item.createdAt)}</td>
+                      <td className="px-4 py-3 text-right">
+                        {formatCurrency(item.amount)}
+                      </td>
+                      <td className="px-4 py-3 text-slate-600">
+                        {item.note ?? "-"}
+                      </td>
+                      <td className="px-4 py-3 text-slate-600">
+                        {formatDateTime(item.createdAt)}
+                      </td>
                       <td className="px-4 py-3 text-right">
                         <form action={deleteOrderExtraCost}>
-                          <input name="orderId" type="hidden" value={order.id} />
+                          <input
+                            name="orderId"
+                            type="hidden"
+                            value={order.id}
+                          />
                           <input name="id" type="hidden" value={item.id} />
-                          <button className="rounded-md border border-red-200 px-3 py-2 text-xs font-semibold text-red-700 hover:bg-red-50" type="submit">Xoa</button>
+                          <button
+                            className="rounded-md border border-red-200 px-3 py-2 text-xs font-semibold text-red-700 hover:bg-red-50"
+                            type="submit"
+                          >
+                            Xoa
+                          </button>
                         </form>
                       </td>
                     </tr>
@@ -155,18 +355,47 @@ export default async function OrderDetailPage({
                 </tbody>
               </table>
             </div>
-            <form action={addOrderExtraCost} className="mt-5 grid gap-3 md:grid-cols-5">
+            <form
+              action={addOrderExtraCost}
+              className="mt-5 grid gap-3 md:grid-cols-5"
+            >
               <input name="orderId" type="hidden" value={order.id} />
-              <select className="rounded-md border border-line bg-white px-3 py-2 text-sm" name="costItemId">
+              <select
+                className="rounded-md border border-line bg-white px-3 py-2 text-sm"
+                name="costItemId"
+              >
                 <option value="">Chon chi phi mau</option>
                 {costItems.map((item) => (
-                  <option key={item.id} value={item.id}>{item.name} - {formatCurrency(item.defaultAmount)}</option>
+                  <option key={item.id} value={item.id}>
+                    {item.name} - {formatCurrency(item.defaultAmount)}
+                  </option>
                 ))}
               </select>
-              <input className="rounded-md border border-line px-3 py-2 text-sm" name="name" placeholder="Ten chi phi" />
-              <input className="rounded-md border border-line px-3 py-2 text-sm" min={0} name="amount" placeholder="Amount" required step="1" type="number" />
-              <input className="rounded-md border border-line px-3 py-2 text-sm" name="note" placeholder="Note" />
-              <button className="rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white" type="submit">Them chi phi</button>
+              <input
+                className="rounded-md border border-line px-3 py-2 text-sm"
+                name="name"
+                placeholder="Ten chi phi"
+              />
+              <input
+                className="rounded-md border border-line px-3 py-2 text-sm"
+                min={0}
+                name="amount"
+                placeholder="Amount"
+                required
+                step="1"
+                type="number"
+              />
+              <input
+                className="rounded-md border border-line px-3 py-2 text-sm"
+                name="note"
+                placeholder="Note"
+              />
+              <button
+                className="rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white"
+                type="submit"
+              >
+                Them chi phi
+              </button>
             </form>
           </section>
 
@@ -182,7 +411,9 @@ export default async function OrderDetailPage({
             </div>
             <div className="mt-4 overflow-x-auto">
               {order.packages.length === 0 ? (
-                <p className="text-sm text-slate-500">Don hang nay chua co kien hang.</p>
+                <p className="text-sm text-slate-500">
+                  Don hang nay chua co kien hang.
+                </p>
               ) : (
                 <table className="min-w-full divide-y divide-line text-sm">
                   <thead className="bg-slate-50 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
@@ -210,7 +441,9 @@ export default async function OrderDetailPage({
                         <td className="whitespace-nowrap px-4 py-3 text-slate-600">
                           {item.chargeableWeight} kg
                         </td>
-                        <td className="px-4 py-3 text-slate-600">{item.description ?? "-"}</td>
+                        <td className="px-4 py-3 text-slate-600">
+                          {item.description ?? "-"}
+                        </td>
                         <td className="whitespace-nowrap px-4 py-3 text-right">
                           <Link
                             className="rounded-md border border-line px-3 py-2 text-xs font-semibold text-brand hover:border-brand hover:bg-blue-50"
@@ -237,18 +470,25 @@ export default async function OrderDetailPage({
                     key={payment.id}
                   >
                     <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                      <p className="font-semibold text-ink">{formatCurrency(payment.amount)}</p>
+                      <p className="font-semibold text-ink">
+                        {formatCurrency(payment.amount)}
+                      </p>
                       <p className="text-slate-500">
-                        {payment.paidAt ? formatDateTime(payment.paidAt) : "Chua ghi nhan paidAt"}
+                        {payment.paidAt
+                          ? formatDateTime(payment.paidAt)
+                          : "Chua ghi nhan paidAt"}
                       </p>
                     </div>
                     <p className="mt-1 text-slate-600">
-                      {payment.method ?? "Khong ro phuong thuc"} - {payment.note ?? "Khong co ghi chu"}
+                      {payment.method ?? "Khong ro phuong thuc"} -{" "}
+                      {payment.note ?? "Khong co ghi chu"}
                     </p>
                   </div>
                 ))
               ) : (
-                <p className="text-sm text-slate-500">Chua co giao dich thanh toan.</p>
+                <p className="text-sm text-slate-500">
+                  Chua co giao dich thanh toan.
+                </p>
               )}
             </div>
           </section>
@@ -256,11 +496,15 @@ export default async function OrderDetailPage({
 
         <div className="space-y-5">
           <section className="rounded-lg border border-line bg-white p-5 shadow-soft">
-            <h2 className="text-base font-semibold text-ink">Cap nhat trang thai</h2>
+            <h2 className="text-base font-semibold text-ink">
+              Cap nhat trang thai
+            </h2>
             <form action={updateOrderStatus} className="mt-4 space-y-3">
               <input name="orderId" type="hidden" value={order.id} />
               <label className="block">
-                <span className="mb-1 block text-sm font-semibold text-slate-700">Trang thai moi</span>
+                <span className="mb-1 block text-sm font-semibold text-slate-700">
+                  Trang thai moi
+                </span>
                 <select
                   className="w-full rounded-md border border-line bg-white px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-blue-100"
                   defaultValue={order.status}
@@ -283,11 +527,15 @@ export default async function OrderDetailPage({
           </section>
 
           <section className="rounded-lg border border-line bg-white p-5 shadow-soft">
-            <h2 className="text-base font-semibold text-ink">Them tracking event</h2>
+            <h2 className="text-base font-semibold text-ink">
+              Them tracking event
+            </h2>
             <form action={addTrackingEvent} className="mt-4 space-y-3">
               <input name="orderId" type="hidden" value={order.id} />
               <label className="block">
-                <span className="mb-1 block text-sm font-semibold text-slate-700">Status</span>
+                <span className="mb-1 block text-sm font-semibold text-slate-700">
+                  Status
+                </span>
                 <select
                   className="w-full rounded-md border border-line bg-white px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-blue-100"
                   defaultValue={order.status}
@@ -301,7 +549,9 @@ export default async function OrderDetailPage({
                 </select>
               </label>
               <label className="block">
-                <span className="mb-1 block text-sm font-semibold text-slate-700">Message</span>
+                <span className="mb-1 block text-sm font-semibold text-slate-700">
+                  Message
+                </span>
                 <textarea
                   className="min-h-20 w-full rounded-md border border-line px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-blue-100"
                   name="message"
@@ -310,7 +560,9 @@ export default async function OrderDetailPage({
                 />
               </label>
               <label className="block">
-                <span className="mb-1 block text-sm font-semibold text-slate-700">Location</span>
+                <span className="mb-1 block text-sm font-semibold text-slate-700">
+                  Location
+                </span>
                 <input
                   className="w-full rounded-md border border-line px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-blue-100"
                   name="location"
@@ -318,7 +570,9 @@ export default async function OrderDetailPage({
                 />
               </label>
               <label className="block">
-                <span className="mb-1 block text-sm font-semibold text-slate-700">Event time</span>
+                <span className="mb-1 block text-sm font-semibold text-slate-700">
+                  Event time
+                </span>
                 <input
                   className="w-full rounded-md border border-line px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-blue-100"
                   defaultValue={toDateTimeLocalValue(new Date())}
@@ -336,11 +590,15 @@ export default async function OrderDetailPage({
           </section>
 
           <section className="rounded-lg border border-line bg-white p-5 shadow-soft">
-            <h2 className="text-base font-semibold text-ink">Thanh toan nhanh</h2>
+            <h2 className="text-base font-semibold text-ink">
+              Thanh toan nhanh
+            </h2>
             <form action={updatePaymentStatus} className="mt-4 space-y-3">
               <input name="orderId" type="hidden" value={order.id} />
               <label className="block">
-                <span className="mb-1 block text-sm font-semibold text-slate-700">Payment status</span>
+                <span className="mb-1 block text-sm font-semibold text-slate-700">
+                  Payment status
+                </span>
                 <select
                   className="w-full rounded-md border border-line bg-white px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-blue-100"
                   defaultValue={order.paymentStatus}
@@ -354,7 +612,9 @@ export default async function OrderDetailPage({
                 </select>
               </label>
               <label className="block">
-                <span className="mb-1 block text-sm font-semibold text-slate-700">Amount</span>
+                <span className="mb-1 block text-sm font-semibold text-slate-700">
+                  Amount
+                </span>
                 <input
                   className="w-full rounded-md border border-line px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-blue-100"
                   min={0}
@@ -365,7 +625,9 @@ export default async function OrderDetailPage({
                 />
               </label>
               <label className="block">
-                <span className="mb-1 block text-sm font-semibold text-slate-700">Method</span>
+                <span className="mb-1 block text-sm font-semibold text-slate-700">
+                  Method
+                </span>
                 <input
                   className="w-full rounded-md border border-line px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-blue-100"
                   name="method"
@@ -373,7 +635,9 @@ export default async function OrderDetailPage({
                 />
               </label>
               <label className="block">
-                <span className="mb-1 block text-sm font-semibold text-slate-700">Note</span>
+                <span className="mb-1 block text-sm font-semibold text-slate-700">
+                  Note
+                </span>
                 <input
                   className="w-full rounded-md border border-line px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-blue-100"
                   name="paymentNote"
@@ -390,7 +654,9 @@ export default async function OrderDetailPage({
           </section>
 
           <section className="rounded-lg border border-line bg-white p-5 shadow-soft">
-            <h2 className="text-base font-semibold text-ink">Timeline tracking</h2>
+            <h2 className="text-base font-semibold text-ink">
+              Timeline tracking
+            </h2>
             <div className="mt-5">
               <TrackingTimeline events={order.trackingEvents} />
             </div>

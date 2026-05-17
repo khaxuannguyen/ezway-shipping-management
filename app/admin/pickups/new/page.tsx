@@ -1,14 +1,19 @@
 import { prisma } from "@/lib/prisma";
 import { PickupNewForm } from "./pickup-new-form";
+import { PageHeader } from "@/components/page-header";
 
 export const dynamic = "force-dynamic";
 
 export default async function NewPickupPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; customerId?: string }>;
+  searchParams: Promise<{
+    error?: string;
+    customerId?: string;
+    orderId?: string;
+  }>;
 }) {
-  const { error, customerId } = await searchParams;
+  const { error, customerId, orderId } = await searchParams;
 
   const customers = await prisma.customer.findMany({
     orderBy: { name: "asc" },
@@ -26,16 +31,28 @@ export default async function NewPickupPage({
     orderBy: { name: "asc" },
   });
 
+  // If orderId is provided, fetch the order to auto-fill sender information
+  let order = null;
+  if (orderId) {
+    order = await prisma.order.findUnique({
+      where: { id: orderId },
+      select: {
+        id: true,
+        orderCode: true,
+        customerId: true,
+        senderName: true,
+        senderPhone: true,
+        senderAddress: true,
+      },
+    });
+  }
+
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-ink">Tạo yêu cầu pickup</h1>
-          <p className="mt-1 text-sm text-slate-600">
-            Tạo yêu cầu pickup hàng tại nhà khách
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        title="Tạo yêu cầu pickup"
+        description="Tạo yêu cầu pickup hàng tại nhà khách"
+      />
 
       <div className="rounded-lg border border-line bg-white p-6">
         <PickupNewForm
@@ -43,6 +60,7 @@ export default async function NewPickupPage({
           drivers={drivers}
           error={error}
           preselectedCustomerId={customerId}
+          prefilledOrder={order}
         />
       </div>
     </div>

@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { OrdersClient } from "./orders-client";
+import { PageHeader } from "@/components/page-header";
 
 export const dynamic = "force-dynamic";
 
@@ -30,20 +30,12 @@ export default async function OrdersPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-ink">Don hang</h1>
-          <p className="mt-1 text-sm text-slate-600">
-            Danh sach order dang doc tu database, include customer.
-          </p>
-        </div>
-        <Link
-          className="w-fit rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
-          href="/admin/orders/new"
-        >
-          Tao don hang
-        </Link>
-      </div>
+      <PageHeader
+        title="Đơn hàng"
+        description="Quản lý và theo dõi tất cả đơn hàng vận chuyển quốc tế"
+        actionLabel="Tạo đơn hàng"
+        actionHref="/admin/orders/new"
+      />
       <OrdersClient orders={serializedOrders} />
     </div>
   );
